@@ -5,8 +5,15 @@ import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { useState, useRef, useCallback } from "react";
 import { Window } from "./window-manager";
-import { Calculator, FileText, Settings, Music, Image as ImageIcon } from "lucide-react";
+import {
+  Calculator,
+  FileText,
+  Settings,
+  Music,
+  Image as ImageIcon,
+} from "lucide-react";
 import { Calculator as CalculatorApp } from "./mini-apps/calculator";
+import { Notes as NotesApp } from "./mini-apps/notes";
 
 interface DockItem {
   id: string;
@@ -35,7 +42,7 @@ const dockItems: DockItem[] = [
     icon: FileText,
     getWindow: () => ({
       title: "Notes",
-      content: <div className="p-4">Notes app coming soon...</div>,
+      content: <NotesApp />,
       width: 500,
       height: 400,
       x: 150,
@@ -92,20 +99,17 @@ export function Dock({ onOpenWindow }: DockProps) {
   const dockRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const getClosestIconIndex = useCallback(
-    (x: number, _y: number) => {
-      if (!dockRef.current) return null;
+  const getClosestIconIndex = useCallback((x: number, _y: number) => {
+    if (!dockRef.current) return null;
 
-      const dockRect = dockRef.current.getBoundingClientRect();
-      const itemWidth = dockRect.width / dockItems.length;
-      const relativeX = x - dockRect.left;
+    const dockRect = dockRef.current.getBoundingClientRect();
+    const itemWidth = dockRect.width / dockItems.length;
+    const relativeX = x - dockRect.left;
 
-      if (relativeX < 0 || relativeX > dockRect.width) return null;
+    if (relativeX < 0 || relativeX > dockRect.width) return null;
 
-      return Math.floor(relativeX / itemWidth);
-    },
-    [],
-  );
+    return Math.floor(relativeX / itemWidth);
+  }, []);
 
   const getScale = (index: number) => {
     if (hoveredIndex === null) return 1;
@@ -150,12 +154,15 @@ export function Dock({ onOpenWindow }: DockProps) {
     >
       <div
         ref={dockRef}
-        className="flex items-end gap-5 rounded-2xl border border-[var(--dock-border)] bg-[var(--dock)] p-3 shadow-2xl"
+        className="flex items-end gap-5 rounded-2xl border border-(--dock-border) bg-(--dock) p-3 shadow-2xl"
         onMouseLeave={() => !isMobile && setHoveredIndex(null)}
         onTouchStart={(e) => {
           if (isMobile) {
             const touch = e.touches[0];
-            const closestIndex = getClosestIconIndex(touch.clientX, touch.clientY);
+            const closestIndex = getClosestIconIndex(
+              touch.clientX,
+              touch.clientY
+            );
             setHoveredIndex(closestIndex);
           }
         }}
@@ -163,7 +170,10 @@ export function Dock({ onOpenWindow }: DockProps) {
           if (isMobile) {
             e.preventDefault();
             const touch = e.touches[0];
-            const closestIndex = getClosestIconIndex(touch.clientX, touch.clientY);
+            const closestIndex = getClosestIconIndex(
+              touch.clientX,
+              touch.clientY
+            );
             setHoveredIndex(closestIndex);
           }
         }}
@@ -195,7 +205,7 @@ export function Dock({ onOpenWindow }: DockProps) {
             >
               {/* Tooltip */}
               <motion.div
-                className="absolute -top-7 rounded-md bg-foreground px-2 py-1 text-[8px] text-background"
+                className="absolute -top-7 rounded-md bg-foreground select-none px-2 py-1 text-[8px] text-background"
                 initial={{ opacity: 0, y: 5 }}
                 animate={{
                   opacity: hoveredIndex === index ? 1 : 0,
@@ -214,7 +224,7 @@ export function Dock({ onOpenWindow }: DockProps) {
               {/* Dock Icon */}
               <div
                 className={cn(
-                  "flex size-10 cursor-pointer items-center justify-center rounded-xl bg-foreground/5 text-foreground shadow-lg transition-shadow hover:bg-foreground/10",
+                  "flex size-10 cursor-pointer items-center justify-center rounded-xl bg-neutral-200 text-foreground shadow-lg transition-shadow hover:bg-neutral-300"
                 )}
               >
                 <Icon className="h-5 w-5" />

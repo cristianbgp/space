@@ -2,25 +2,16 @@
 
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
+import { DateTime } from "luxon";
 
 export function MenuBar() {
   const [currentTime, setCurrentTime] = useState(
-    new Date().toLocaleTimeString("en-US", {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    })
+    DateTime.now().toLocaleString(DateTime.TIME_SIMPLE)
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(
-        new Date().toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-        })
-      );
+      setCurrentTime(DateTime.now().toLocaleString(DateTime.TIME_SIMPLE));
     }, 1000);
 
     return () => clearInterval(interval);

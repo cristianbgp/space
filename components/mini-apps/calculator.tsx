@@ -34,7 +34,11 @@ export function Calculator() {
     setOperation(nextOperation);
   };
 
-  const calculate = (firstValue: number, secondValue: number, operation: string): number => {
+  const calculate = (
+    firstValue: number,
+    secondValue: number,
+    operation: string
+  ): number => {
     switch (operation) {
       case "+":
         return firstValue + secondValue;
@@ -94,24 +98,36 @@ export function Calculator() {
         <Button onClick={clear} className="col-span-2 bg-muted">
           Clear
         </Button>
-        <Button onClick={() => inputOperation("÷")} className="bg-foreground/10">
+        <Button
+          onClick={() => inputOperation("÷")}
+          className="bg-foreground/10"
+        >
           ÷
         </Button>
-        <Button onClick={() => inputOperation("×")} className="bg-foreground/10">
+        <Button
+          onClick={() => inputOperation("×")}
+          className="bg-foreground/10"
+        >
           ×
         </Button>
 
         <Button onClick={() => inputNumber("7")}>7</Button>
         <Button onClick={() => inputNumber("8")}>8</Button>
         <Button onClick={() => inputNumber("9")}>9</Button>
-        <Button onClick={() => inputOperation("-")} className="bg-foreground/10">
+        <Button
+          onClick={() => inputOperation("-")}
+          className="bg-foreground/10"
+        >
           −
         </Button>
 
         <Button onClick={() => inputNumber("4")}>4</Button>
         <Button onClick={() => inputNumber("5")}>5</Button>
         <Button onClick={() => inputNumber("6")}>6</Button>
-        <Button onClick={() => inputOperation("+")} className="bg-foreground/10">
+        <Button
+          onClick={() => inputOperation("+")}
+          className="bg-foreground/10"
+        >
           +
         </Button>
 
@@ -120,7 +136,7 @@ export function Calculator() {
         <Button onClick={() => inputNumber("3")}>3</Button>
         <Button
           onClick={performCalculation}
-          className="row-span-2 bg-foreground text-background"
+          className="row-span-2 bg-foreground"
         >
           =
         </Button>
@@ -133,4 +149,3 @@ export function Calculator() {
     </div>
   );
 }
-

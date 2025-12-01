@@ -42,18 +42,27 @@ export function Desktop() {
   const focusWindow = (id: string) => {
     setActiveWindowId(id);
     // Bring the focused window to the front
-    setWindows(
-      windows.map((w) => ({
+    setWindows((currentWindows) => {
+      const maxZIndex = Math.max(...currentWindows.map((w) => w.zIndex), 0);
+      return currentWindows.map((w) => ({
         ...w,
-        zIndex: w.id === id ? windows.length : w.zIndex,
-      }))
+        zIndex: w.id === id ? maxZIndex + 1 : w.zIndex,
+      }));
+    });
+  };
+
+  const resizeWindow = (id: string, width: number, height: number) => {
+    setWindows((currentWindows) =>
+      currentWindows.map((w) =>
+        w.id === id ? { ...w, width, height } : w
+      )
     );
   };
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-background">
       {/* Desktop background */}
-      <div className="absolute inset-0 bg-linear-to-br from-background via-background to-muted/20" />
+      <div className="absolute inset-0 bg-linear-to-br from-neutral-300 via-neutral-300 to-neutral-100" />
       
       {/* Menu Bar */}
       <MenuBar />
@@ -64,6 +73,7 @@ export function Desktop() {
         activeWindowId={activeWindowId}
         onClose={closeWindow}
         onFocus={focusWindow}
+        onResize={resizeWindow}
       />
       
       {/* Dock */}
