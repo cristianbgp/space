@@ -84,15 +84,29 @@ function WindowComponent({
   const width = useMotionValue(window.width);
   const height = useMotionValue(window.height);
   const [isResizing, setIsResizing] = useState(false);
-  const resizeStartPos = useRef({ x: 0, y: 0, width: 0, height: 0, direction: "" });
+  const resizeStartPos = useRef({ 
+    pointerX: 0, 
+    pointerY: 0, 
+    windowX: 0,
+    windowY: 0,
+    width: 0, 
+    height: 0, 
+    direction: "" 
+  });
+  const hasInitialized = useRef(false);
 
   useEffect(() => {
-    // Sync position with window prop if it changes externally
-    if (window.x !== x.get() || window.y !== y.get()) {
+    // Only sync position from window props on initial mount
+    if (!hasInitialized.current) {
       x.set(window.x);
       y.set(window.y);
+      width.set(window.width);
+      height.set(window.height);
+      hasInitialized.current = true;
     }
-    if (window.width !== width.get() || window.height !== height.get()) {
+    
+    // After init, only sync width/height changes (not position)
+    if (hasInitialized.current && (window.width !== width.get() || window.height !== height.get())) {
       width.set(window.width);
       height.set(window.height);
     }
@@ -103,8 +117,10 @@ function WindowComponent({
     setIsResizing(true);
     onFocus(window.id);
     resizeStartPos.current = {
-      x: e.clientX,
-      y: e.clientY,
+      pointerX: e.clientX,
+      pointerY: e.clientY,
+      windowX: x.get(),
+      windowY: y.get(),
       width: width.get(),
       height: height.get(),
       direction,
@@ -114,49 +130,57 @@ function WindowComponent({
   const handleResize = (e: PointerEvent) => {
     if (!isResizing || !containerRef.current) return;
 
-    const { direction } = resizeStartPos.current;
-    const deltaX = e.clientX - resizeStartPos.current.x;
-    const deltaY = e.clientY - resizeStartPos.current.y;
+    const { direction, windowX, windowY } = resizeStartPos.current;
+    const deltaX = e.clientX - resizeStartPos.current.pointerX;
+    const deltaY = e.clientY - resizeStartPos.current.pointerY;
     const containerRect = containerRef.current.getBoundingClientRect();
     const minWidth = 200;
     const minHeight = 150;
 
     let newWidth = resizeStartPos.current.width;
     let newHeight = resizeStartPos.current.height;
-    let newX = x.get();
-    let newY = y.get();
+    let newX = windowX;
+    let newY = windowY;
 
     if (direction.includes("e")) {
       newWidth = Math.max(minWidth, resizeStartPos.current.width + deltaX);
-      const maxWidth = containerRect.width - (x.get() || 0);
+      const maxWidth = containerRect.width - windowX;
       newWidth = Math.min(newWidth, maxWidth);
     }
     if (direction.includes("w")) {
-      newWidth = Math.max(minWidth, resizeStartPos.current.width - deltaX);
-      const maxWidth = (x.get() || 0) + resizeStartPos.current.width;
-      newWidth = Math.min(newWidth, maxWidth);
-      if (newWidth !== resizeStartPos.current.width) {
-        newX = (x.get() || 0) + (resizeStartPos.current.width - newWidth);
+      const potentialWidth = Math.max(minWidth, resizeStartPos.current.width - deltaX);
+      const maxWidth = windowX + resizeStartPos.current.width;
+      newWidth = Math.min(potentialWidth, maxWidth);
+      // Adjust X position based on width change
+      newX = windowX + (resizeStartPos.current.width - newWidth);
+      // Ensure we don't go past left edge
+      if (newX < 0) {
+        newX = 0;
+        newWidth = windowX + resizeStartPos.current.width;
       }
     }
     if (direction.includes("s")) {
       newHeight = Math.max(minHeight, resizeStartPos.current.height + deltaY);
-      const maxHeight = containerRect.height - (y.get() || 0);
+      const maxHeight = containerRect.height - windowY;
       newHeight = Math.min(newHeight, maxHeight);
     }
     if (direction.includes("n")) {
-      newHeight = Math.max(minHeight, resizeStartPos.current.height - deltaY);
-      const maxHeight = (y.get() || 0) + resizeStartPos.current.height;
-      newHeight = Math.min(newHeight, maxHeight);
-      if (newHeight !== resizeStartPos.current.height) {
-        newY = (y.get() || 0) + (resizeStartPos.current.height - newHeight);
+      const potentialHeight = Math.max(minHeight, resizeStartPos.current.height - deltaY);
+      const maxHeight = windowY + resizeStartPos.current.height;
+      newHeight = Math.min(potentialHeight, maxHeight);
+      // Adjust Y position based on height change
+      newY = windowY + (resizeStartPos.current.height - newHeight);
+      // Ensure we don't go past top edge (account for menu bar at 28px)
+      if (newY < 28) {
+        newY = 28;
+        newHeight = windowY + resizeStartPos.current.height - 28;
       }
     }
 
     width.set(newWidth);
     height.set(newHeight);
-    if (newX !== x.get()) x.set(newX);
-    if (newY !== y.get()) y.set(newY);
+    x.set(newX);
+    y.set(newY);
   };
 
   const handleResizeEnd = () => {
@@ -241,7 +265,7 @@ function WindowComponent({
             <button className="h-3 w-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500" />
             <button className="h-3 w-3 rounded-full bg-green-500/80 hover:bg-green-500" />
           </div>
-          <span className="ml-2 text-xs font-medium text-foreground">
+          <span className="ml-2 text-xs select-none font-medium text-foreground">
             {window.title}
           </span>
         </div>

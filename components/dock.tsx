@@ -10,11 +10,12 @@ import {
   FileText,
   Settings,
   Music,
-  Image as ImageIcon,
+  ImageIcon,
+  SparklesIcon,
 } from "lucide-react";
 import { Calculator as CalculatorApp } from "./mini-apps/calculator";
-import { Notes as NotesApp } from "./mini-apps/notes";
-
+import { NotesApp } from "./mini-apps/notes";
+import { AIApp } from "./mini-apps/ai-app";
 interface DockItem {
   id: string;
   name: string;
@@ -50,15 +51,15 @@ const dockItems: DockItem[] = [
     }),
   },
   {
-    id: "settings",
-    name: "Settings",
-    icon: Settings,
+    id: "ai",
+    name: "AI",
+    icon: SparklesIcon,
     getWindow: () => ({
-      title: "Settings",
-      content: <div className="p-4">Settings app coming soon...</div>,
-      width: 600,
+      title: "AI",
+      content: <AIApp />,
+      width: 700,
       height: 500,
-      x: 200,
+      x: 300,
       y: 100,
     }),
   },
@@ -76,15 +77,15 @@ const dockItems: DockItem[] = [
     }),
   },
   {
-    id: "gallery",
-    name: "Gallery",
-    icon: ImageIcon,
+    id: "settings",
+    name: "Settings",
+    icon: Settings,
     getWindow: () => ({
-      title: "Gallery",
-      content: <div className="p-4">Gallery app coming soon...</div>,
-      width: 700,
+      title: "Settings",
+      content: <div className="p-4">Settings app coming soon...</div>,
+      width: 600,
       height: 500,
-      x: 300,
+      x: 200,
       y: 100,
     }),
   },

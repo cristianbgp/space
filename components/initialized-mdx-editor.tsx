@@ -34,7 +34,7 @@ export default function InitializedMDXEditor({
               <BoldItalicUnderlineToggles />
             </>
           ),
-          toolbarClassName: "rounded-none! backdrop-blur-md! bg-background/0!",
+          toolbarClassName: "rounded-none! bg-background/0!",
         }),
       ]}
       {...props}

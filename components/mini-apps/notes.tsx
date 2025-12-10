@@ -2,7 +2,7 @@
 
 import { MDXEditor } from "@/components/mdx-editor";
 import { Suspense, useRef, useState } from "react";
-import { FileText } from "lucide-react";
+import { FileText, PlusIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -188,50 +188,67 @@ Today was productive! I made good progress on the project and learned a few new 
   },
 ];
 
-export function Notes() {
+export function NotesApp() {
   const [selectedNoteId, setSelectedNoteId] = useState<string>(
     exampleNotes[0].id
   );
   const mdxEditorRef = useRef<MDXEditorMethods>(null);
 
-  const selectedNote =
-    exampleNotes.find((note) => note.id === selectedNoteId) || exampleNotes[0];
+  const selectedNote = exampleNotes.find((note) => note.id === selectedNoteId);
 
   return (
-    <div className="flex h-full w-full">
+    <div className="flex w-full min-h-full">
       <SidebarProvider defaultOpen={false}>
-        <Sidebar collapsible="icon" className="h-full relative bg-red-300">
-            <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupLabel>Notes</SidebarGroupLabel>
-                <SidebarGroupContent>
-                  <SidebarMenu>
-                    {exampleNotes.map((note) => (
-                      <SidebarMenuItem key={note.id}>
-                        <SidebarMenuButton
-                          isActive={selectedNoteId === note.id}
-                          onClick={() => {
-                            setSelectedNoteId(note.id);
-                            mdxEditorRef.current?.setMarkdown(note.content);
-                          }}
-                        >
-                          <FileText />
-                          <span>{note.title}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </SidebarGroupContent>
-              </SidebarGroup>
-            </SidebarContent>
+        <Sidebar collapsible="icon" className="sticky top-0 h-full bg-red-300">
+          <SidebarContent>
+            <SidebarGroup>
+              <SidebarGroupContent>
+                <SidebarMenu>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className=" border"
+                      variant="outline"
+                      onClick={() => {
+                        setSelectedNoteId("new");
+                        mdxEditorRef.current?.setMarkdown("");
+                      }}
+                    >
+                      <PlusIcon />
+                      <span>New Note</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  {exampleNotes.map((note) => (
+                    <SidebarMenuItem key={note.id}>
+                      <SidebarMenuButton
+                        isActive={selectedNoteId === note.id}
+                        onClick={() => {
+                          setSelectedNoteId(note.id);
+                          mdxEditorRef.current?.setMarkdown(note.content);
+                        }}
+                      >
+                        <FileText />
+                        <span>{note.title}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          </SidebarContent>
         </Sidebar>
-        <div className="flex flex-col h-full overflow-hidden flex-1">
-          <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+        <div className="flex flex-col flex-1 min-w-0">
+          <header className="flex h-12 rounded-none backdrop-blur-md bg-background/0 shrink-0 items-center gap-2 border-b px-4 sticky top-0 z-10">
             <SidebarTrigger className="-ml-1" />
+            <span className="text-sm font-medium">
+              {selectedNote?.title || ""}
+            </span>
           </header>
-          <div className="flex flex-1 flex-col p-4 overflow-auto">
+          <div className="flex flex-col p-4">
             <Suspense>
-              <MDXEditor ref={mdxEditorRef} markdown={selectedNote.content} />
+              <MDXEditor
+                ref={mdxEditorRef}
+                markdown={selectedNote?.content || ""}
+              />
             </Suspense>
           </div>
         </div>
