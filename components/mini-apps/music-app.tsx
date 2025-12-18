@@ -3,66 +3,31 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useNumaMixes } from "@/hooks/use-numa-mixes";
 
-interface Track {
-  id: string;
+export interface Track {
+  index: number;
   title: string;
-  url: string;
-  colors: string[];
-  titleColor: string;
+  duration: string;
+  timestamp: string;
 }
 
-const tracks: Track[] = [
-  {
-    id: "numa.001",
-    title: "under the sun",
-    url: "https://mixes.numa.channel/mixes/numa.001-under_the_sun.mp3",
-    colors: ["#f5e6d3", "#e8d4b8"],
-    titleColor: "#2d2d2d",
-  },
-  {
-    id: "numa.002",
-    title: "evening rain",
-    url: "https://mixes.numa.channel/mixes/numa.002-evening_rain.mp3",
-    colors: ["#a7b6c8", "#1c436d"],
-    titleColor: "#e0e0e0",
-  },
-  {
-    id: "numa.003",
-    title: "neon dust",
-    url: "https://mixes.numa.channel/mixes/numa.003-neon_dust.mp3",
-    colors: ["#2a1f3d", "#4a3f5e"],
-    titleColor: "#d4a5ff",
-  },
-  {
-    id: "numa.004",
-    title: "blurred streets",
-    url: "https://mixes.numa.channel/mixes/numa.004-blurred_streets.mp3",
-    colors: ["#f0935a", "#9b6d9f", "#2c3e5e"],
-    titleColor: "#e8d4c4",
-  },
-  {
-    id: "numa.005",
-    title: "pale mornings",
-    url: "https://mixes.numa.channel/mixes/numa.005-pale_mornings.mp3",
-    colors: ["#f5f0e8", "#d4d0c8", "#b8b5d0"],
-    titleColor: "#8b8a8a",
-  },
-  {
-    id: "numa.006",
-    title: "quiet rooms",
-    url: "https://mixes.numa.channel/mixes/numa.006-quiet_rooms.mp3",
-    colors: ["#e8ddd4", "#c9b8a8", "#a89b8f"],
-    titleColor: "#5a5249",
-  },
-  {
-    id: "numa.007",
-    title: "blurry sundays",
-    url: "https://mixes.numa.channel/mixes/numa.007-blurry_sundays.mp3",
-    colors: ["#e5b452", "#f2c57d", "#ffedcc"],
-    titleColor: "#c76d00",
-  },
-];
+export interface Mix {
+  id: string;
+  title: string;
+  theme: string;
+  description: string;
+  release_date: string;
+  duration: string;
+  colors: string[];
+  title_color: string;
+  subtitle_color: string;
+  youtube_url?: string;
+  tracks: Track[];
+  created_with: string;
+  license: string;
+  music_url?: string;
+}
 
 export function MusicApp() {
   const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -71,7 +36,8 @@ export function MusicApp() {
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const currentTrack = tracks[currentTrackIndex];
+  const { data: mixes } = useNumaMixes();
+  const currentTrack = mixes?.[currentTrackIndex];
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -108,11 +74,13 @@ export function MusicApp() {
   };
 
   const handleNext = () => {
-    setCurrentTrackIndex((prev) => (prev + 1) % tracks.length);
+    setCurrentTrackIndex((prev) => (prev + 1) % (mixes?.length || 0));
   };
 
   const handlePrevious = () => {
-    setCurrentTrackIndex((prev) => (prev - 1 + tracks.length) % tracks.length);
+    setCurrentTrackIndex(
+      (prev) => (prev - 1 + (mixes?.length || 0)) % (mixes?.length || 0)
+    );
   };
 
   const handleTrackSelect = (index: number) => {
@@ -135,9 +103,11 @@ export function MusicApp() {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  if (!currentTrack) return null;
+
   return (
     <div className="flex flex-col w-full h-full bg-linear-to-br from-neutral-200 to-neutral-100 text-black p-3 overflow-hidden">
-      <audio ref={audioRef} src={currentTrack.url} />
+      <audio ref={audioRef} src={currentTrack.music_url} />
 
       <div className="mb-2">
         <h1 className="text-lg font-bold select-none">numa</h1>
@@ -146,24 +116,26 @@ export function MusicApp() {
       <div
         className="rounded-lg p-2 mb-2"
         style={{
-          background: `linear-gradient(to bottom right, ${currentTrack.colors.join(", ")})`,
+          background: `linear-gradient(to bottom right, ${currentTrack.colors.join(
+            ", "
+          )})`,
         }}
       >
         <div
           className="text-[10px] uppercase tracking-wide opacity-70"
-          style={{ color: currentTrack.titleColor }}
+          style={{ color: currentTrack.title_color }}
         >
           Now Playing
         </div>
         <div
           className="text-sm font-semibold"
-          style={{ color: currentTrack.titleColor }}
+          style={{ color: currentTrack.title_color }}
         >
           {currentTrack.id}
         </div>
         <div
           className="text-xs opacity-80"
-          style={{ color: currentTrack.titleColor }}
+          style={{ color: currentTrack.title_color }}
         >
           {currentTrack.title}
         </div>
@@ -266,9 +238,9 @@ export function MusicApp() {
           Playlist
         </h2>
         <div className="space-y-0.5">
-          {tracks.map((track, index) => (
+          {mixes.map((mix, index) => (
             <button
-              key={track.id}
+              key={mix.id}
               onClick={() => handleTrackSelect(index)}
               className={cn(
                 "w-full text-left px-2 py-1.5 rounded cursor-pointer transition-colors",
@@ -286,9 +258,9 @@ export function MusicApp() {
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-xs truncate">{track.id}</div>
+                  <div className="font-medium text-xs truncate">{mix.id}</div>
                   <div className="text-[10px] text-neutral-600 truncate">
-                    {track.title}
+                    {mix.title}
                   </div>
                 </div>
               </div>

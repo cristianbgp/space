@@ -3,20 +3,20 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, Suspense } from "react";
 import { Window } from "./window-manager";
 import {
   Calculator,
   FileText,
   Settings,
   Music,
-  ImageIcon,
   SparklesIcon,
 } from "lucide-react";
 import { Calculator as CalculatorApp } from "./mini-apps/calculator";
 import { NotesApp } from "./mini-apps/notes";
 import { AIApp } from "./mini-apps/ai-app";
 import { MusicApp } from "./mini-apps/music-app";
+import { Skeleton } from "./ui/skeleton";
 interface DockItem {
   id: string;
   name: string;
@@ -70,7 +70,17 @@ const dockItems: DockItem[] = [
     icon: Music,
     getWindow: () => ({
       title: "Music",
-      content: <MusicApp />,
+      content: (
+        <Suspense
+          fallback={
+            <div className="w-full h-full flex justify-center items-center">
+              <Skeleton className="w-full h-full bg-neutral-200 rounded-none" />
+            </div>
+          }
+        >
+          <MusicApp />
+        </Suspense>
+      ),
       width: 500,
       height: 300,
       x: 250,
