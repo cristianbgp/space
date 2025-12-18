@@ -16,6 +16,7 @@ import {
 import { Calculator as CalculatorApp } from "./mini-apps/calculator";
 import { NotesApp } from "./mini-apps/notes";
 import { AIApp } from "./mini-apps/ai-app";
+import { MusicApp } from "./mini-apps/music-app";
 interface DockItem {
   id: string;
   name: string;
@@ -69,9 +70,9 @@ const dockItems: DockItem[] = [
     icon: Music,
     getWindow: () => ({
       title: "Music",
-      content: <div className="p-4">Music app coming soon...</div>,
+      content: <MusicApp />,
       width: 500,
-      height: 400,
+      height: 300,
       x: 250,
       y: 150,
     }),

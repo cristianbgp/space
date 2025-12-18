@@ -26,13 +26,6 @@ export function MenuBar() {
     >
       <div className="flex items-center gap-4">
         <span className="font-semibold text-foreground font-mono">.space</span>
-        <div className="flex gap-3 text-muted-foreground">
-          <button className="hover:text-foreground transition-colors">File</button>
-          <button className="hover:text-foreground transition-colors">Edit</button>
-          <button className="hover:text-foreground transition-colors">View</button>
-          <button className="hover:text-foreground transition-colors">Window</button>
-          <button className="hover:text-foreground transition-colors">Help</button>
-        </div>
       </div>
       <div className="flex items-center gap-4 text-muted-foreground">
         <div className="flex gap-2">
