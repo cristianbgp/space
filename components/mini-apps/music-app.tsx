@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNumaMixes } from "@/hooks/use-numa-mixes";
+import { useMusicStore } from "@/lib/music-store";
 
 export interface Track {
   index: number;
@@ -30,14 +31,18 @@ export interface Mix {
 }
 
 export function MusicApp() {
-  const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const { data: mixes } = useNumaMixes();
-  const currentTrack = mixes?.[currentTrackIndex];
+  const currentTrackIndex = useMusicStore((state) => state.currentTrackIndex);
+  const isPlaying = useMusicStore((state) => state.isPlaying);
+  const setCurrentTrackIndex = useMusicStore((state) => state.setCurrentTrackIndex);
+  const setIsPlaying = useMusicStore((state) => state.setIsPlaying);
+  const goToNextTrack = useMusicStore((state) => state.goToNextTrack);
+  const goToPreviousTrack = useMusicStore((state) => state.goToPreviousTrack);
+  const currentTrack = mixes?.[currentTrackIndex ?? 0];
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -74,13 +79,11 @@ export function MusicApp() {
   };
 
   const handleNext = () => {
-    setCurrentTrackIndex((prev) => (prev + 1) % (mixes?.length || 0));
+    goToNextTrack(mixes?.length || 0);
   };
 
   const handlePrevious = () => {
-    setCurrentTrackIndex(
-      (prev) => (prev - 1 + (mixes?.length || 0)) % (mixes?.length || 0)
-    );
+    goToPreviousTrack(mixes?.length || 0);
   };
 
   const handleTrackSelect = (index: number) => {

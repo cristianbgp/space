@@ -5,4 +5,5 @@ import useSWR from "swr";
 export const useNumaMixes = () =>
   useSWR<Mix[]>("https://numa.channel/data.json", fetcher, {
     suspense: true,
+    revalidateOnFocus: false,
   });

@@ -17,6 +17,7 @@ import { NotesApp } from "./mini-apps/notes";
 import { AIApp } from "./mini-apps/ai-app";
 import { MusicApp } from "./mini-apps/music-app";
 import { Skeleton } from "./ui/skeleton";
+import { ErrorBoundary } from "./error-boundary";
 interface DockItem {
   id: string;
   name: string;
@@ -71,15 +72,17 @@ const dockItems: DockItem[] = [
     getWindow: () => ({
       title: "Music",
       content: (
-        <Suspense
-          fallback={
-            <div className="w-full h-full flex justify-center items-center">
-              <Skeleton className="w-full h-full bg-neutral-200 rounded-none" />
-            </div>
-          }
-        >
-          <MusicApp />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex justify-center items-center">
+                <Skeleton className="w-full h-full bg-neutral-200 rounded-none" />
+              </div>
+            }
+          >
+            <MusicApp />
+          </Suspense>
+        </ErrorBoundary>
       ),
       width: 500,
       height: 300,
