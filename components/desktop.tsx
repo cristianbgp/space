@@ -1,21 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MenuBar } from "./menu-bar";
 import { Dock } from "./dock";
 import { WindowManager } from "./window-manager";
 import type { Window } from "./window-manager";
+import { Mix } from "./mini-apps/music-app";
+import { useMusicStore } from "@/lib/music-store";
 
-export function Desktop() {
+export function Desktop({ mixes }: { mixes: Mix[] }) {
   const [windows, setWindows] = useState<Window[]>([]);
   const [activeWindowId, setActiveWindowId] = useState<string | null>(null);
+  const setMixes = useMusicStore((state) => state.setMixes);
 
   const openWindow = (window: Window) => {
     const windowId = window.id || `window-${Date.now()}`;
-    
+
     // Check if this app is already open
     const existingWindow = windows.find((w) => w.id === windowId);
-    
+
     if (existingWindow) {
       // If already open, just focus it
       focusWindow(windowId);
@@ -35,7 +38,9 @@ export function Desktop() {
     const remaining = windows.filter((w) => w.id !== id);
     setWindows(remaining);
     if (activeWindowId === id) {
-      setActiveWindowId(remaining.length > 0 ? remaining[remaining.length - 1].id : null);
+      setActiveWindowId(
+        remaining.length > 0 ? remaining[remaining.length - 1].id : null
+      );
     }
   };
 
@@ -53,20 +58,24 @@ export function Desktop() {
 
   const resizeWindow = (id: string, width: number, height: number) => {
     setWindows((currentWindows) =>
-      currentWindows.map((w) =>
-        w.id === id ? { ...w, width, height } : w
-      )
+      currentWindows.map((w) => (w.id === id ? { ...w, width, height } : w))
     );
   };
+
+  useEffect(() => {
+    if (mixes.length > 0) {
+      setMixes(mixes);
+    }
+  }, [mixes]);
 
   return (
     <div className="relative h-screen w-screen overflow-hidden bg-background">
       {/* Desktop background */}
       <div className="absolute inset-0 bg-linear-to-br from-neutral-300 via-neutral-300 to-neutral-100" />
-      
+
       {/* Menu Bar */}
       <MenuBar />
-      
+
       {/* Window Manager */}
       <WindowManager
         windows={windows}
@@ -75,10 +84,9 @@ export function Desktop() {
         onFocus={focusWindow}
         onResize={resizeWindow}
       />
-      
+
       {/* Dock */}
       <Dock onOpenWindow={openWindow} />
     </div>
   );
 }
-

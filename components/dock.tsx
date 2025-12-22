@@ -73,15 +73,7 @@ const dockItems: DockItem[] = [
       title: "Music",
       content: (
         <ErrorBoundary>
-          <Suspense
-            fallback={
-              <div className="w-full h-full flex justify-center items-center">
-                <Skeleton className="w-full h-full bg-neutral-200 rounded-none" />
-              </div>
-            }
-          >
-            <MusicApp />
-          </Suspense>
+          <MusicApp />
         </ErrorBoundary>
       ),
       width: 500,

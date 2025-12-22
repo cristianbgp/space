@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useNumaMixes } from "@/hooks/use-numa-mixes";
 import { useMusicStore } from "@/lib/music-store";
 
 export interface Track {
@@ -35,10 +34,12 @@ export function MusicApp() {
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  const { data: mixes } = useNumaMixes();
+  const mixes = useMusicStore((state) => state.mixes);
   const currentTrackIndex = useMusicStore((state) => state.currentTrackIndex);
   const isPlaying = useMusicStore((state) => state.isPlaying);
-  const setCurrentTrackIndex = useMusicStore((state) => state.setCurrentTrackIndex);
+  const setCurrentTrackIndex = useMusicStore(
+    (state) => state.setCurrentTrackIndex
+  );
   const setIsPlaying = useMusicStore((state) => state.setIsPlaying);
   const goToNextTrack = useMusicStore((state) => state.goToNextTrack);
   const goToPreviousTrack = useMusicStore((state) => state.goToPreviousTrack);
@@ -76,6 +77,7 @@ export function MusicApp() {
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
+    setCurrentTrackIndex(currentTrackIndex ?? 0);
   };
 
   const handleNext = () => {
