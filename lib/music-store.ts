@@ -5,6 +5,9 @@ const initialState = {
   mixes: [] as Mix[],
   currentTrackIndex: null as number | null,
   isPlaying: false,
+  currentTime: 0,
+  duration: 0,
+  seekTime: null as number | null,
 };
 
 type MusicState = typeof initialState & {
@@ -13,6 +16,10 @@ type MusicState = typeof initialState & {
   goToNextTrack: (length: number) => void;
   goToPreviousTrack: (length: number) => void;
   setIsPlaying: (isPlaying: boolean) => void;
+  setCurrentTime: (time: number) => void;
+  setDuration: (duration: number) => void;
+  seekTo: (time: number) => void;
+  clearSeek: () => void;
   reset: () => void;
 };
 
@@ -29,5 +36,9 @@ export const useMusicStore = create<MusicState>()((set) => ({
       currentTrackIndex: ((state.currentTrackIndex ?? 0) - 1 + length) % length,
     })),
   setIsPlaying: (isPlaying) => set({ isPlaying }),
+  setCurrentTime: (time) => set({ currentTime: time }),
+  setDuration: (duration) => set({ duration }),
+  seekTo: (time) => set({ seekTime: time, currentTime: time }),
+  clearSeek: () => set({ seekTime: null }),
   reset: () => set(initialState),
 }));

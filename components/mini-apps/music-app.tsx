@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef, ChangeEvent } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMusicStore } from "@/lib/music-store";
+import { useNumaMixes } from "@/hooks/use-numa-mixes";
 
 export interface Track {
   index: number;
@@ -30,54 +31,33 @@ export interface Mix {
 }
 
 export function MusicApp() {
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const audioRef = useRef<HTMLAudioElement>(null);
-
+  const { data: fetchedMixes } = useNumaMixes();
   const mixes = useMusicStore((state) => state.mixes);
+  const setMixes = useMusicStore((state) => state.setMixes);
   const currentTrackIndex = useMusicStore((state) => state.currentTrackIndex);
   const isPlaying = useMusicStore((state) => state.isPlaying);
+  const currentTime = useMusicStore((state) => state.currentTime);
+  const duration = useMusicStore((state) => state.duration);
   const setCurrentTrackIndex = useMusicStore(
     (state) => state.setCurrentTrackIndex
   );
   const setIsPlaying = useMusicStore((state) => state.setIsPlaying);
+  const seekTo = useMusicStore((state) => state.seekTo);
   const goToNextTrack = useMusicStore((state) => state.goToNextTrack);
   const goToPreviousTrack = useMusicStore((state) => state.goToPreviousTrack);
   const currentTrack = mixes?.[currentTrackIndex ?? 0];
 
   useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const handleLoadedMetadata = () => setDuration(audio.duration);
-    const handleEnded = () => handleNext();
-
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-    audio.addEventListener("ended", handleEnded);
-
-    return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, []);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (isPlaying) {
-      audio.play();
-    } else {
-      audio.pause();
+    if (fetchedMixes && fetchedMixes.length > 0) {
+      setMixes(fetchedMixes);
     }
-  }, [isPlaying, currentTrackIndex]);
+  }, [fetchedMixes, setMixes]);
 
   const handlePlayPause = () => {
     setIsPlaying(!isPlaying);
-    setCurrentTrackIndex(currentTrackIndex ?? 0);
+    if (currentTrackIndex === null && mixes && mixes.length > 0) {
+      setCurrentTrackIndex(0);
+    }
   };
 
   const handleNext = () => {
@@ -94,11 +74,8 @@ export function MusicApp() {
   };
 
   const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
     const time = parseFloat(e.target.value);
-    audio.currentTime = time;
-    setCurrentTime(time);
+    seekTo(time);
   };
 
   const formatTime = (time: number) => {
@@ -112,8 +89,6 @@ export function MusicApp() {
 
   return (
     <div className="flex flex-col w-full h-full bg-linear-to-br from-neutral-200 to-neutral-100 text-black p-3 overflow-hidden">
-      <audio ref={audioRef} src={currentTrack.music_url} />
-
       <div className="mb-2">
         <h1 className="text-lg font-bold select-none">numa</h1>
       </div>

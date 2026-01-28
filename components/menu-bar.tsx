@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { DateTime } from "luxon";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,6 +11,80 @@ import {
 } from "@/components/ui/popover";
 import { MusicIcon, PauseIcon, PlayIcon } from "lucide-react";
 import { useMusicStore } from "@/lib/music-store";
+
+function AudioPlayer() {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const mixes = useMusicStore((state) => state.mixes);
+  const currentTrackIndex = useMusicStore((state) => state.currentTrackIndex);
+  const isPlaying = useMusicStore((state) => state.isPlaying);
+  const seekTime = useMusicStore((state) => state.seekTime);
+  const setCurrentTime = useMusicStore((state) => state.setCurrentTime);
+  const setDuration = useMusicStore((state) => state.setDuration);
+  const clearSeek = useMusicStore((state) => state.clearSeek);
+  const goToNextTrack = useMusicStore((state) => state.goToNextTrack);
+
+  const currentTrack =
+    currentTrackIndex !== null ? mixes?.[currentTrackIndex] : null;
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const handleTimeUpdate = () => setCurrentTime(audio.currentTime);
+    const handleDurationChange = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
+    };
+    const handleEnded = () => goToNextTrack(mixes?.length || 0);
+
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleDurationChange);
+    audio.addEventListener("durationchange", handleDurationChange);
+    audio.addEventListener("ended", handleEnded);
+
+    // Check if duration is already available (for cached audio)
+    if (audio.duration && !isNaN(audio.duration)) {
+      setDuration(audio.duration);
+    }
+
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleDurationChange);
+      audio.removeEventListener("durationchange", handleDurationChange);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, [setCurrentTime, setDuration, goToNextTrack, mixes?.length, currentTrackIndex]);
+
+  useEffect(() => {
+    // Reset time when track changes
+    setCurrentTime(0);
+    setDuration(0);
+  }, [currentTrackIndex, setCurrentTime, setDuration]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.play();
+    } else {
+      audio.pause();
+    }
+  }, [isPlaying, currentTrackIndex]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || seekTime === null) return;
+
+    audio.currentTime = seekTime;
+    clearSeek();
+  }, [seekTime, clearSeek]);
+
+  if (!currentTrack?.music_url) return null;
+
+  return <audio ref={audioRef} src={currentTrack.music_url} />;
+}
 
 function MiniMusicPlayer() {
   const mixes = useMusicStore((state) => state.mixes);
@@ -175,32 +249,37 @@ export function MenuBar() {
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="menu-bar-blur fixed top-0 left-0 right-0 z-50 flex h-7 items-center justify-between border-b border-(--menu-bar-border) bg-(--menu-bar) px-4 text-xs"
-    >
-      <div className="flex items-center gap-4">
-        <span className="font-semibold text-foreground font-mono">.space</span>
-      </div>
-      <div className="flex items-center gap-4 text-muted-foreground">
-        <MiniMusicPlayer />
-        <div className="flex gap-2">
-          <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
-          <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
-          <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
+    <>
+      <AudioPlayer />
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="menu-bar-blur fixed top-0 left-0 right-0 z-50 flex h-7 items-center justify-between border-b border-(--menu-bar-border) bg-(--menu-bar) px-4 text-xs"
+      >
+        <div className="flex items-center gap-4">
+          <span className="font-semibold text-foreground font-mono">
+            .space
+          </span>
         </div>
-        <motion.span
-          key={currentTime}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-          className="font-medium"
-        >
-          {currentTime}
-        </motion.span>
-      </div>
-    </motion.div>
+        <div className="flex items-center gap-4 text-muted-foreground">
+          <MiniMusicPlayer />
+          <div className="flex gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
+            <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
+            <div className="h-1.5 w-1.5 rounded-full bg-foreground/20" />
+          </div>
+          <motion.span
+            key={currentTime}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 2 }}
+            className="font-medium"
+          >
+            {currentTime}
+          </motion.span>
+        </div>
+      </motion.div>
+    </>
   );
 }
