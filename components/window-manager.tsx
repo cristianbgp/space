@@ -36,6 +36,27 @@ export function WindowManager({
   onResize,
 }: WindowManagerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastEscapeTime = useRef<number>(0);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && activeWindowId) {
+        const now = Date.now();
+        const timeSinceLastEscape = now - lastEscapeTime.current;
+
+        if (timeSinceLastEscape < 400) {
+          // Double escape detected - close active window
+          onClose(activeWindowId);
+          lastEscapeTime.current = 0;
+        } else {
+          lastEscapeTime.current = now;
+        }
+      }
+    };
+
+    globalThis.addEventListener("keydown", handleKeyDown);
+    return () => globalThis.removeEventListener("keydown", handleKeyDown);
+  }, [activeWindowId, onClose]);
 
   return (
     <div
