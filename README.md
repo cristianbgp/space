@@ -4,7 +4,7 @@
   <img src="https://space.cristianbgp.com/logo.png" alt="Space Logo" width="200" />
 </div>
 
-A minimalist desktop environment built with Next.js.
+A minimalist desktop environment built inside your browser.
 
 ## Getting Started
 
