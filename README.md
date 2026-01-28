@@ -1,5 +1,9 @@
 # Space
 
+<div align="center">
+  <img src="https://space.cristianbgp.com/logo.png" alt="Space Logo" width="200" />
+</div>
+
 A minimalist desktop environment built with Next.js.
 
 ## Getting Started
@@ -25,3 +29,7 @@ Copy `.env.example` to `.env` and add your Groq API key:
 ```
 GROQ_API_KEY=your_api_key_here
 ```
+
+## License
+
+MIT
