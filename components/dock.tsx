@@ -25,75 +25,118 @@ interface DockItem {
   getWindow: () => Omit<Window, "id" | "zIndex">;
 }
 
+// Helper to calculate responsive window dimensions
+function getResponsiveWindow(
+  preferredWidth: number,
+  preferredHeight: number,
+  preferredX: number,
+  preferredY: number
+) {
+  const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1200;
+  const viewportHeight = typeof window !== "undefined" ? window.innerHeight : 800;
+  
+  // Available space (accounting for menu bar and dock)
+  const availableWidth = viewportWidth - 20; // 10px margin on each side
+  const availableHeight = viewportHeight - 130; // menu bar + dock + margins
+  
+  // Clamp width and height to fit viewport
+  const width = Math.min(preferredWidth, availableWidth);
+  const height = Math.min(preferredHeight, availableHeight);
+  
+  // Center the window if it would overflow, otherwise use preferred position
+  const maxX = viewportWidth - width - 10;
+  const maxY = viewportHeight - height - 110; // account for dock
+  
+  const x = Math.max(10, Math.min(preferredX, maxX));
+  const y = Math.max(30, Math.min(preferredY, maxY)); // account for menu bar
+  
+  return { width, height, x, y };
+}
+
 const dockItems: DockItem[] = [
   {
     id: "calculator",
     name: "Calculator",
     icon: Calculator,
-    getWindow: () => ({
-      title: "Calculator",
-      content: <CalculatorApp />,
-      width: 300,
-      height: 400,
-      x: 100,
-      y: 100,
-    }),
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(300, 400, 100, 100);
+      return {
+        title: "Calculator",
+        content: <CalculatorApp />,
+        width,
+        height,
+        x,
+        y,
+      };
+    },
   },
   {
     id: "notes",
     name: "Notes",
     icon: FileText,
-    getWindow: () => ({
-      title: "Notes",
-      content: <NotesApp />,
-      width: 500,
-      height: 400,
-      x: 150,
-      y: 150,
-    }),
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(500, 400, 150, 150);
+      return {
+        title: "Notes",
+        content: <NotesApp />,
+        width,
+        height,
+        x,
+        y,
+      };
+    },
   },
   {
     id: "ai",
     name: "AI",
     icon: SparklesIcon,
-    getWindow: () => ({
-      title: "AI",
-      content: <AIApp />,
-      width: 700,
-      height: 500,
-      x: 300,
-      y: 100,
-    }),
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(700, 500, 300, 100);
+      return {
+        title: "AI",
+        content: <AIApp />,
+        width,
+        height,
+        x,
+        y,
+      };
+    },
   },
   {
     id: "music",
     name: "Music",
     icon: Music,
-    getWindow: () => ({
-      title: "Music",
-      content: (
-        <ErrorBoundary>
-          <MusicApp />
-        </ErrorBoundary>
-      ),
-      width: 500,
-      height: 300,
-      x: 250,
-      y: 150,
-    }),
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(500, 300, 250, 150);
+      return {
+        title: "Music",
+        content: (
+          <ErrorBoundary>
+            <MusicApp />
+          </ErrorBoundary>
+        ),
+        width,
+        height,
+        x,
+        y,
+      };
+    },
   },
   {
     id: "settings",
     name: "Settings",
     icon: Settings,
-    getWindow: () => ({
-      title: "Settings",
-      content: <div className="p-4">Settings app coming soon...</div>,
-      width: 600,
-      height: 500,
-      x: 200,
-      y: 100,
-    }),
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(600, 500, 200, 100);
+      return {
+        title: "Settings",
+        content: <div className="p-4">Settings app coming soon...</div>,
+        width,
+        height,
+        x,
+        y,
+      };
+    },
   },
 ];
 
@@ -157,11 +200,11 @@ export function Dock({ onOpenWindow }: DockProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className="dock-blur fixed bottom-4 left-1/2 z-40 -translate-x-1/2 transform"
+      className="dock-blur fixed bottom-2 md:bottom-4 left-1/2 z-40 -translate-x-1/2 transform"
     >
       <div
         ref={dockRef}
-        className="flex items-end gap-5 rounded-2xl border border-(--dock-border) bg-(--dock) p-3 shadow-2xl"
+        className="flex items-end gap-3 md:gap-5 rounded-2xl border border-(--dock-border) bg-(--dock) p-2 md:p-3 shadow-2xl"
         onMouseLeave={() => !isMobile && setHoveredIndex(null)}
         onTouchStart={(e) => {
           if (isMobile) {
@@ -231,10 +274,10 @@ export function Dock({ onOpenWindow }: DockProps) {
               {/* Dock Icon */}
               <div
                 className={cn(
-                  "flex size-10 cursor-pointer items-center justify-center rounded-xl bg-neutral-200 text-foreground shadow-lg transition-shadow hover:bg-neutral-300"
+                  "flex size-9 md:size-10 cursor-pointer items-center justify-center rounded-xl bg-neutral-200 text-foreground shadow-lg transition-shadow hover:bg-neutral-300"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <Icon className="h-4 w-4 md:h-5 md:w-5" />
               </div>
             </motion.div>
           );

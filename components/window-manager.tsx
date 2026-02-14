@@ -8,6 +8,7 @@ import {
   useMotionValue,
 } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface Window {
   id: string;
@@ -37,6 +38,7 @@ export function WindowManager({
 }: WindowManagerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const lastEscapeTime = useRef<number>(0);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -62,7 +64,10 @@ export function WindowManager({
     <div
       ref={containerRef}
       className="absolute inset-0"
-      style={{ paddingTop: "28px", paddingBottom: "100px" }}
+      style={{ 
+        paddingTop: isMobile ? "24px" : "28px", 
+        paddingBottom: isMobile ? "70px" : "100px" 
+      }}
     >
       <AnimatePresence>
         {windows.map((window) => (
@@ -74,6 +79,7 @@ export function WindowManager({
             onFocus={onFocus}
             onResize={onResize}
             containerRef={containerRef}
+            isMobile={isMobile}
           />
         ))}
       </AnimatePresence>
@@ -88,6 +94,7 @@ interface WindowComponentProps {
   onFocus: (id: string) => void;
   onResize?: (id: string, width: number, height: number) => void;
   containerRef: React.RefObject<HTMLDivElement | null>;
+  isMobile: boolean;
 }
 
 function WindowComponent({
@@ -97,6 +104,7 @@ function WindowComponent({
   onFocus,
   onResize,
   containerRef,
+  isMobile,
 }: WindowComponentProps) {
   const windowRef = useRef<HTMLDivElement>(null);
   const dragControls = useDragControls();
@@ -211,6 +219,7 @@ function WindowComponent({
     setIsResizing(false);
   };
 
+  // Resize event listeners - must be before conditional return to maintain hook order
   useEffect(() => {
     if (isResizing) {
       const handlePointerMove = (e: PointerEvent) => {
@@ -226,6 +235,65 @@ function WindowComponent({
       };
     }
   }, [isResizing, x, y, width, height]);
+
+  // Mobile layout - full width, centered, fill available height
+  // Account for menu bar (24px) and dock (~62px including padding)
+  if (isMobile) {
+    return (
+      <motion.div
+        ref={windowRef}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{
+          opacity: 1,
+          scale: 1,
+          y: 0,
+        }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{
+          type: "spring",
+          stiffness: 300,
+          damping: 30,
+          opacity: { duration: 0.2 },
+        }}
+        className={cn(
+          "absolute left-2 right-2 rounded-lg border border-(--window-border) bg-card shadow-2xl",
+          isActive ? "ring-1 ring-foreground/20" : ""
+        )}
+        style={{
+          top: 28, // Menu bar height + small gap
+          bottom: 66, // Dock height + gap
+          zIndex: window.zIndex,
+          boxShadow: isActive
+            ? "0 20px 25px -5px var(--window-shadow), 0 10px 10px -5px var(--window-shadow)"
+            : "0 10px 15px -3px var(--window-shadow), 0 4px 6px -2px var(--window-shadow)",
+        }}
+        onClick={() => onFocus(window.id)}
+      >
+        {/* Title Bar */}
+        <div className="flex h-10 items-center justify-between rounded-t-lg border-b border-border bg-muted/30 px-3">
+          <div className="flex items-center gap-2">
+            <button
+              className="h-4 w-4 rounded-full bg-red-500/80 hover:bg-red-500 flex items-center justify-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose(window.id);
+              }}
+            >
+              <span className="text-[10px] text-red-900/50">✕</span>
+            </button>
+            <span className="ml-2 text-sm select-none font-medium text-foreground">
+              {window.title}
+            </span>
+          </div>
+        </div>
+
+        {/* Window Content */}
+        <div className="h-[calc(100%-2.5rem)] overflow-auto rounded-b-lg bg-card">
+          {window.content}
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
