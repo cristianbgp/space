@@ -262,6 +262,8 @@ function WindowComponent({
         style={{
           top: 28, // Menu bar height + small gap
           bottom: 66, // Dock height + gap
+          width: "auto",
+          height: "auto",
           zIndex: window.zIndex,
           boxShadow: isActive
             ? "0 20px 25px -5px var(--window-shadow), 0 10px 10px -5px var(--window-shadow)"
