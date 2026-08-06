@@ -9,6 +9,7 @@ import { Calculator as CalculatorApp } from "./mini-apps/calculator";
 import { NotesApp } from "./mini-apps/notes";
 import { AIApp } from "./mini-apps/ai-app";
 import { MusicApp } from "./mini-apps/music-app";
+import { TasksApp } from "./mini-apps/tasks";
 import { ErrorBoundary } from "./error-boundary";
 interface DockItem {
   id: AppIconId;
@@ -102,6 +103,21 @@ const dockItems: DockItem[] = [
             <MusicApp />
           </ErrorBoundary>
         ),
+        width,
+        height,
+        x,
+        y,
+      };
+    },
+  },
+  {
+    id: "tasks",
+    name: "Tasks",
+    getWindow: () => {
+      const { width, height, x, y } = getResponsiveWindow(680, 500, 220, 90);
+      return {
+        title: "Tasks",
+        content: <TasksApp />,
         width,
         height,
         x,

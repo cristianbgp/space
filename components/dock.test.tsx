@@ -31,14 +31,26 @@ describe("Dock", () => {
 
     render(<Dock onOpenWindow={onOpenWindow} />);
 
-    for (const name of ["Calculator", "Notes", "AI", "Music", "Settings"]) {
+    for (const name of [
+      "Calculator",
+      "Notes",
+      "AI",
+      "Music",
+      "Tasks",
+      "Settings",
+    ]) {
       expect(screen.getByRole("button", { name })).toBeTruthy();
     }
 
-    fireEvent.click(screen.getByRole("button", { name: "Notes" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tasks" }));
 
     expect(onOpenWindow).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "notes", title: "Notes" })
+      expect.objectContaining({
+        id: "tasks",
+        title: "Tasks",
+        width: 680,
+        height: 500,
+      })
     );
   });
 });

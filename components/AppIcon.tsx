@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   AudioWaveform,
   Calculator,
+  ListTodo,
   NotebookPen,
   SlidersHorizontal,
   Sparkles,
@@ -15,6 +16,7 @@ export type AppIconId =
   | "notes"
   | "ai"
   | "music"
+  | "tasks"
   | "settings";
 
 interface AppIconTreatment {
@@ -47,6 +49,12 @@ const treatments: Record<AppIconId, AppIconTreatment> = {
     glyph: AudioWaveform,
     surface: "from-neutral-600 via-neutral-800 to-neutral-950",
     glow: "bg-white/22",
+    glyphColor: "text-white",
+  },
+  tasks: {
+    glyph: ListTodo,
+    surface: "from-neutral-200 via-neutral-500 to-neutral-800",
+    glow: "bg-white/48",
     glyphColor: "text-white",
   },
   settings: {
