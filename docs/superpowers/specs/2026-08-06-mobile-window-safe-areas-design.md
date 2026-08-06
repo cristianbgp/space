@@ -10,7 +10,7 @@ The mobile shell uses fixed pixel offsets and `h-screen`. Mobile windows nearly 
 
 ## Design Direction
 
-Preserve the monochrome desktop metaphor and introduce an inset floating-window treatment on viewports below 768px.
+Preserve the monochrome desktop metaphor and introduce an inset floating-window treatment on portrait viewports below 768px and compact landscape viewports up to 950px wide and 500px tall.
 
 - Use `100dvh` for the desktop root so mobile browser chrome changes do not destabilize the layout.
 - Add safe-area-aware menu bar padding and height.
@@ -33,7 +33,7 @@ The safe-area offsets use `env(safe-area-inset-top, 0px)` and `env(safe-area-ins
 
 The menu bar occupies the top safe area plus `--mobile-menu-height`. The mobile window starts after the menu bar plus `--mobile-shell-gap`. Its bottom edge sits above the dock height, bottom safe area, and another `--mobile-shell-gap`. The dock sits `0.5rem` above the bottom safe area.
 
-In landscape mobile layouts, the shell reduces the vertical gap to `0.5rem` so short screens retain useful app content without returning to an edge-to-edge window.
+In compact landscape layouts up to 950px wide and 500px tall, the shell reduces the vertical gap to `0.5rem` and reserves `5.5rem` for the wider dock treatment. This keeps the dock from overlapping the window without returning to an edge-to-edge frame.
 
 ## Window Treatment
 

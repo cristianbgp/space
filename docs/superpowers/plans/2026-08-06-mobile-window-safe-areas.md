@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Preserve the existing monochrome palette and semantic color tokens.
-- Mobile means viewports below 768px, matching `useIsMobile`.
+- Mobile means portrait viewports below 768px or compact landscape viewports up to 950px wide and 500px tall, matching `useIsMobile`.
 - Use `100dvh`, never `h-screen`, for the desktop shell.
 - Use `env(safe-area-inset-top, 0px)` and `env(safe-area-inset-bottom, 0px)` without JavaScript viewport measurement.
 - Keep desktop window geometry, dragging, and resizing unchanged.
@@ -83,8 +83,9 @@ Add the four mobile shell properties to `:root`, set `html` and `body` to full s
   --mobile-shell-gap: 0.75rem;
 }
 
-@media (max-width: 767px) and (orientation: landscape) {
+@media (max-width: 950px) and (max-height: 500px) {
   :root {
+    --mobile-dock-height: 5.5rem;
     --mobile-shell-gap: 0.5rem;
   }
 }
