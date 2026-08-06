@@ -1,9 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect, KeyboardEvent } from "react";
+import * as React from "react";
+import { BorderBeam } from "border-beam";
+import { Send, Sparkles } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { SparklesIcon } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -11,29 +13,29 @@ interface Message {
 }
 
 export function AIApp() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [input, setInput] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [input]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     // Focus textarea after loading is complete
     if (!isLoading && textareaRef.current) {
       textareaRef.current.focus();
@@ -79,7 +81,7 @@ export function AIApp() {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
@@ -87,14 +89,14 @@ export function AIApp() {
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-background">
+    <div className="flex h-full w-full flex-col bg-background">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-            <SparklesIcon className="w-10 h-10 stroke-1 text-muted-foreground" />
+          <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+            <Sparkles className="size-10 stroke-1 text-muted-foreground" />
             <p className="text-sm">Start a conversation</p>
-            <p className="text-xs mt-1">Powered by Llama 3.3</p>
+            <p className="mt-1 text-xs">Powered by Llama 3.3</p>
           </div>
         )}
 
@@ -119,17 +121,17 @@ export function AIApp() {
           </div>
         ))}
 
-        {isLoading && (
+        {isLoading ? (
           <div className="flex justify-start">
-            <div className="bg-muted rounded-lg px-3 py-2">
-              <div className="flex gap-1">
-                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                <span className="w-2 h-2 bg-foreground/50 rounded-full animate-bounce" />
-              </div>
-            </div>
+            <p
+              aria-live="polite"
+              className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground"
+              role="status"
+            >
+              Thinking…
+            </p>
           </div>
-        )}
+        ) : null}
 
         {error && (
           <div className="flex justify-center">
@@ -144,40 +146,45 @@ export function AIApp() {
 
       {/* Input */}
       <div className="border-t border-border p-3">
-        <div className="flex gap-2">
-          <textarea
-            ref={textareaRef}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            disabled={isLoading}
-            rows={1}
-            className="flex-1 resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-foreground/20 disabled:opacity-50"
-          />
-          <Button
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
-            size="icon"
-            className="h-auto min-h-[40px] self-end"
+        <BorderBeam
+          active={isLoading}
+          className="w-full"
+          colorVariant="mono"
+          duration={2.8}
+          size="pulse-inner"
+          strength={0.45}
+          theme="light"
+        >
+          <div
+            className="flex gap-2 rounded-xl border border-border bg-background p-2"
+            data-state={isLoading ? "generating" : "idle"}
+            data-testid="ai-composer"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+            <textarea
+              aria-label="Message"
+              autoComplete="off"
+              className="min-h-10 min-w-0 flex-1 resize-none bg-transparent px-1 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:ring-0 disabled:opacity-50"
+              disabled={isLoading}
+              name="message"
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message…"
+              ref={textareaRef}
+              rows={1}
+              value={input}
+            />
+            <Button
+              aria-label="Send message"
+              className="size-10 self-end rounded-lg"
+              disabled={!input.trim() || isLoading}
+              onClick={sendMessage}
+              size="icon"
             >
-              <path d="m22 2-7 20-4-9-9-4Z" />
-              <path d="M22 2 11 13" />
-            </svg>
-          </Button>
-        </div>
-        <p className="text-[10px] text-muted-foreground mt-2 text-center">
+              <Send aria-hidden="true" className="size-4" />
+            </Button>
+          </div>
+        </BorderBeam>
+        <p className="mt-2 text-center text-[10px] text-muted-foreground">
           Press Enter to send, Shift+Enter for new line
         </p>
       </div>
