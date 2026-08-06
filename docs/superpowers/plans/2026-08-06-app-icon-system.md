@@ -13,7 +13,8 @@
 - Preserve the existing monochrome desktop, translucent dock, and spring magnification behavior.
 - Use one rounded-square geometry and one icon stroke system across all five apps.
 - Use direct Lucide component imports from the project's existing dependency; add no package and draw no SVG path manually.
-- Keep app color inside icon tiles and use graphite, paper-gold, cobalt, garnet, and titanium treatments.
+- Keep every icon treatment inside the neutral grayscale palette and use smoked graphite, pearl, mirrored chrome, charcoal satin, and aluminum treatments.
+- Do not use chromatic Tailwind utilities in app icon surfaces, highlights, glyphs, borders, or shadows.
 - Render launchers as semantic buttons with accessible names, visible focus, and pressed feedback.
 - Keep the five-item dock usable at the existing mobile breakpoint.
 

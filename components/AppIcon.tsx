@@ -27,33 +27,33 @@ interface AppIconTreatment {
 const treatments: Record<AppIconId, AppIconTreatment> = {
   calculator: {
     glyph: Calculator,
-    surface: "from-zinc-500 via-zinc-700 to-zinc-950",
+    surface: "from-neutral-400 via-neutral-700 to-neutral-950",
     glow: "bg-white/28",
     glyphColor: "text-white",
   },
   notes: {
     glyph: NotebookPen,
-    surface: "from-amber-100 via-amber-300 to-amber-600",
+    surface: "from-neutral-50 via-neutral-200 to-neutral-500",
     glow: "bg-white/55",
-    glyphColor: "text-amber-950",
+    glyphColor: "text-neutral-950",
   },
   ai: {
     glyph: Sparkles,
-    surface: "from-sky-400 via-blue-600 to-blue-950",
-    glow: "bg-cyan-100/45",
+    surface: "from-neutral-200 via-neutral-600 to-neutral-950",
+    glow: "bg-white/45",
     glyphColor: "text-white",
   },
   music: {
     glyph: AudioWaveform,
-    surface: "from-rose-400 via-rose-700 to-red-950",
-    glow: "bg-orange-100/35",
+    surface: "from-neutral-600 via-neutral-800 to-neutral-950",
+    glow: "bg-white/22",
     glyphColor: "text-white",
   },
   settings: {
     glyph: SlidersHorizontal,
-    surface: "from-slate-100 via-slate-300 to-slate-600",
+    surface: "from-neutral-50 via-neutral-300 to-neutral-600",
     glow: "bg-white/60",
-    glyphColor: "text-slate-950",
+    glyphColor: "text-neutral-950",
   },
 };
 
@@ -71,7 +71,7 @@ export function AppIcon({ app, className }: AppIconProps) {
       aria-hidden="true"
       data-app-icon={app}
       className={cn(
-        "relative isolate flex size-10 shrink-0 overflow-hidden rounded-[13px] border border-white/45 bg-linear-to-br shadow-[0_8px_18px_-8px_rgba(15,23,42,0.8),inset_0_1px_0_rgba(255,255,255,0.5)] md:size-11 md:rounded-[14px]",
+        "relative isolate flex size-10 shrink-0 overflow-hidden rounded-[13px] border border-white/45 bg-linear-to-br shadow-[0_8px_18px_-8px_rgba(23,23,23,0.72),inset_0_1px_0_rgba(255,255,255,0.5)] md:size-11 md:rounded-[14px]",
         treatment.surface,
         className
       )}

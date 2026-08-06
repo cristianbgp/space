@@ -6,15 +6,15 @@ Replace the dock's generic gray icon buttons with a coherent, recognizable app i
 
 ## Design Direction
 
-Use a **mineral glass** direction. Each app receives a restrained material identity while every tile shares the same rounded-square silhouette, border highlight, optical icon size, shadow construction, and interaction behavior.
+Use a **monochrome mineral glass** direction. Every app stays inside the project's neutral grayscale palette while receiving a distinct material identity. All tiles share the same rounded-square silhouette, border highlight, optical icon size, shadow construction, and interaction behavior.
 
-- Calculator: graphite, precise and dense.
-- Notes: warm paper-gold, quiet and tactile.
-- AI: cobalt glass, clear and energetic without a generic purple gradient.
-- Music: deep garnet, expressive but controlled.
-- Settings: titanium, neutral and mechanical.
+- Calculator: smoked graphite, precise and dense.
+- Notes: pearl, quiet and tactile.
+- AI: mirrored chrome, clear and energetic through contrast.
+- Music: charcoal satin, expressive but controlled.
+- Settings: aluminum, neutral and mechanical.
 
-The dock surface remains monochrome. Color is limited to the app objects, which makes them easier to recognize without changing the broader `.space` palette.
+The dock and every app object remain monochromatic. Recognition comes from glyph silhouette, gradient range, and light-dark contrast rather than hue. The implementation must contain no chromatic Tailwind utilities in the app icon treatments.
 
 ## Component Boundary
 
