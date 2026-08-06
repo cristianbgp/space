@@ -255,7 +255,7 @@ export function MenuBar() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="menu-bar-blur fixed top-0 left-0 right-0 z-50 flex h-6 md:h-7 items-center justify-between border-b border-(--menu-bar-border) bg-(--menu-bar) px-4 text-xs"
+        className="menu-bar-blur fixed inset-x-0 top-0 z-50 flex h-[calc(var(--mobile-menu-height)+env(safe-area-inset-top,0px))] items-end justify-between border-b border-(--menu-bar-border) bg-(--menu-bar) px-4 pb-1 text-xs md:h-7 md:items-center md:pb-0"
       >
         <div className="flex items-center gap-4">
           <span className="font-semibold text-foreground font-mono">

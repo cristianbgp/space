@@ -69,7 +69,7 @@ export function Desktop({ mixes }: { mixes: Mix[] }) {
   }, [mixes]);
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-background">
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-background">
       {/* Desktop background */}
       <div className="absolute inset-0 bg-linear-to-br from-neutral-300 via-neutral-300 to-neutral-100" />
 

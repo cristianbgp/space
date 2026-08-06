@@ -202,7 +202,7 @@ export function Dock({ onOpenWindow }: DockProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className="dock-blur fixed bottom-2 md:bottom-4 left-1/2 z-40 -translate-x-1/2 transform"
+      className="dock-blur fixed bottom-[calc(env(safe-area-inset-bottom,0px)+0.5rem)] left-1/2 z-40 -translate-x-1/2 transform md:bottom-4"
     >
       <div
         ref={dockRef}

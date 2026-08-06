@@ -50,7 +50,7 @@ const noteWindow: Window = {
 };
 
 describe("WindowManager mobile sizing", () => {
-  it("clears desktop dimensions when rendering the mobile window", () => {
+  it("insets the window around mobile browser safe areas", () => {
     render(
       <WindowManager
         activeWindowId="notes"
@@ -60,11 +60,26 @@ describe("WindowManager mobile sizing", () => {
       />
     );
 
-    const windowElement = screen
-      .getByText("Note content")
-      .closest<HTMLDivElement>(".absolute.left-2");
+    const windowElement = screen.getByTestId("mobile-window-notes");
 
-    expect(windowElement?.style.width).toBe("auto");
-    expect(windowElement?.style.height).toBe("auto");
+    expect(windowElement.style.left).toBe("var(--mobile-shell-gutter)");
+    expect(windowElement.style.right).toBe("var(--mobile-shell-gutter)");
+    expect(windowElement.style.top).toContain("safe-area-inset-top");
+    expect(windowElement.style.bottom).toContain("safe-area-inset-bottom");
+    expect(windowElement.style.width).toBe("");
+    expect(windowElement.style.height).toBe("");
+  });
+
+  it("gives the mobile close control an accessible name", () => {
+    render(
+      <WindowManager
+        activeWindowId="notes"
+        onClose={vi.fn()}
+        onFocus={vi.fn()}
+        windows={[noteWindow]}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Close Notes" })).toBeTruthy();
   });
 });

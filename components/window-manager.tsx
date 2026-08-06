@@ -7,6 +7,7 @@ import {
   useDragControls,
   useMotionValue,
 } from "motion/react";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -64,10 +65,6 @@ export function WindowManager({
     <div
       ref={containerRef}
       className="absolute inset-0"
-      style={{ 
-        paddingTop: isMobile ? "24px" : "28px", 
-        paddingBottom: isMobile ? "70px" : "100px" 
-      }}
     >
       <AnimatePresence>
         {windows.map((window) => (
@@ -236,12 +233,12 @@ function WindowComponent({
     }
   }, [isResizing, x, y, width, height]);
 
-  // Mobile layout - full width, centered, fill available height
-  // Account for menu bar (24px) and dock (~62px including padding)
+  // Mobile layout stays inset between the safe-area-aware menu bar and dock.
   if (isMobile) {
     return (
       <motion.div
         ref={windowRef}
+        data-testid={`mobile-window-${window.id}`}
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{
           opacity: 1,
@@ -256,14 +253,14 @@ function WindowComponent({
           opacity: { duration: 0.2 },
         }}
         className={cn(
-          "absolute left-2 right-2 rounded-lg border border-(--window-border) bg-card shadow-2xl",
+          "absolute min-h-0 overflow-hidden rounded-xl border border-(--window-border) bg-card shadow-2xl",
           isActive ? "ring-1 ring-foreground/20" : ""
         )}
         style={{
-          top: 28, // Menu bar height + small gap
-          bottom: 66, // Dock height + gap
-          width: "auto",
-          height: "auto",
+          left: "var(--mobile-shell-gutter)",
+          right: "var(--mobile-shell-gutter)",
+          top: "calc(env(safe-area-inset-top, 0px) + var(--mobile-menu-height) + var(--mobile-shell-gap))",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + var(--mobile-dock-height) + var(--mobile-shell-gap))",
           zIndex: window.zIndex,
           boxShadow: isActive
             ? "0 20px 25px -5px var(--window-shadow), 0 10px 10px -5px var(--window-shadow)"
@@ -272,25 +269,29 @@ function WindowComponent({
         onClick={() => onFocus(window.id)}
       >
         {/* Title Bar */}
-        <div className="flex h-10 items-center justify-between rounded-t-lg border-b border-border bg-muted/30 px-3">
-          <div className="flex items-center gap-2">
+        <div className="flex h-10 items-center justify-between rounded-t-xl border-b border-border bg-muted/30 px-2">
+          <div className="flex min-w-0 items-center gap-1">
             <button
-              className="h-4 w-4 rounded-full bg-red-500/80 hover:bg-red-500 flex items-center justify-center"
+              aria-label={`Close ${window.title}`}
+              className="flex size-8 shrink-0 touch-manipulation items-center justify-center rounded-md outline-none transition-colors hover:bg-foreground/8 focus-visible:ring-2 focus-visible:ring-ring"
               onClick={(e) => {
                 e.stopPropagation();
                 onClose(window.id);
               }}
+              type="button"
             >
-              <span className="text-[10px] text-red-900/50">✕</span>
+              <span className="flex size-4 items-center justify-center rounded-full bg-foreground/12 text-foreground/65">
+                <X aria-hidden="true" className="size-2.5" strokeWidth={2} />
+              </span>
             </button>
-            <span className="ml-2 text-sm select-none font-medium text-foreground">
+            <span className="min-w-0 truncate text-sm font-medium text-foreground select-none">
               {window.title}
             </span>
           </div>
         </div>
 
         {/* Window Content */}
-        <div className="h-[calc(100%-2.5rem)] overflow-auto rounded-b-lg bg-card">
+        <div className="h-[calc(100%-2.5rem)] min-h-0 overscroll-contain overflow-auto rounded-b-xl bg-card">
           {window.content}
         </div>
       </motion.div>
