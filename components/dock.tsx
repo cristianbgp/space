@@ -1,27 +1,18 @@
 "use client";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
+import { AppIcon, type AppIconId } from "@/components/AppIcon";
 import { motion } from "motion/react";
-import { useState, useRef, useCallback, Suspense } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Window } from "./window-manager";
-import {
-  Calculator,
-  FileText,
-  Settings,
-  Music,
-  SparklesIcon,
-} from "lucide-react";
 import { Calculator as CalculatorApp } from "./mini-apps/calculator";
 import { NotesApp } from "./mini-apps/notes";
 import { AIApp } from "./mini-apps/ai-app";
 import { MusicApp } from "./mini-apps/music-app";
-import { Skeleton } from "./ui/skeleton";
 import { ErrorBoundary } from "./error-boundary";
 interface DockItem {
-  id: string;
+  id: AppIconId;
   name: string;
-  icon: React.ComponentType<{ className?: string }>;
   getWindow: () => Omit<Window, "id" | "zIndex">;
 }
 
@@ -57,7 +48,6 @@ const dockItems: DockItem[] = [
   {
     id: "calculator",
     name: "Calculator",
-    icon: Calculator,
     getWindow: () => {
       const { width, height, x, y } = getResponsiveWindow(300, 400, 100, 100);
       return {
@@ -73,7 +63,6 @@ const dockItems: DockItem[] = [
   {
     id: "notes",
     name: "Notes",
-    icon: FileText,
     getWindow: () => {
       const { width, height, x, y } = getResponsiveWindow(500, 400, 150, 150);
       return {
@@ -89,7 +78,6 @@ const dockItems: DockItem[] = [
   {
     id: "ai",
     name: "AI",
-    icon: SparklesIcon,
     getWindow: () => {
       const { width, height, x, y } = getResponsiveWindow(700, 500, 300, 100);
       return {
@@ -105,7 +93,6 @@ const dockItems: DockItem[] = [
   {
     id: "music",
     name: "Music",
-    icon: Music,
     getWindow: () => {
       const { width, height, x, y } = getResponsiveWindow(500, 300, 250, 150);
       return {
@@ -125,7 +112,6 @@ const dockItems: DockItem[] = [
   {
     id: "settings",
     name: "Settings",
-    icon: Settings,
     getWindow: () => {
       const { width, height, x, y } = getResponsiveWindow(600, 500, 200, 100);
       return {
@@ -149,7 +135,7 @@ export function Dock({ onOpenWindow }: DockProps) {
   const dockRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const getClosestIconIndex = useCallback((x: number, _y: number) => {
+  const getClosestIconIndex = useCallback((x: number) => {
     if (!dockRef.current) return null;
 
     const dockRect = dockRef.current.getBoundingClientRect();
@@ -209,10 +195,7 @@ export function Dock({ onOpenWindow }: DockProps) {
         onTouchStart={(e) => {
           if (isMobile) {
             const touch = e.touches[0];
-            const closestIndex = getClosestIconIndex(
-              touch.clientX,
-              touch.clientY
-            );
+            const closestIndex = getClosestIconIndex(touch.clientX);
             setHoveredIndex(closestIndex);
           }
         }}
@@ -220,10 +203,7 @@ export function Dock({ onOpenWindow }: DockProps) {
           if (isMobile) {
             e.preventDefault();
             const touch = e.touches[0];
-            const closestIndex = getClosestIconIndex(
-              touch.clientX,
-              touch.clientY
-            );
+            const closestIndex = getClosestIconIndex(touch.clientX);
             setHoveredIndex(closestIndex);
           }
         }}
@@ -234,14 +214,11 @@ export function Dock({ onOpenWindow }: DockProps) {
         }}
       >
         {dockItems.map((item, index) => {
-          const Icon = item.icon;
-
           return (
             <motion.div
               key={item.id}
               className="relative flex flex-col items-center"
               onMouseEnter={() => !isMobile && setHoveredIndex(index)}
-              onClick={() => handleClick(item)}
               animate={{
                 scale: getScale(index),
                 y: getTranslateY(index),
@@ -272,13 +249,14 @@ export function Dock({ onOpenWindow }: DockProps) {
               </motion.div>
 
               {/* Dock Icon */}
-              <div
-                className={cn(
-                  "flex size-9 md:size-10 cursor-pointer items-center justify-center rounded-xl bg-neutral-200 text-foreground shadow-lg transition-shadow hover:bg-neutral-300"
-                )}
+              <button
+                type="button"
+                aria-label={item.name}
+                onClick={() => handleClick(item)}
+                className="cursor-pointer rounded-[13px] outline-none transition-transform duration-150 active:scale-[0.94] focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-transparent md:rounded-[14px]"
               >
-                <Icon className="h-4 w-4 md:h-5 md:w-5" />
-              </div>
+                <AppIcon app={item.id} />
+              </button>
             </motion.div>
           );
         })}
