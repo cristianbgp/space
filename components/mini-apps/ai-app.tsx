@@ -12,13 +12,46 @@ interface Message {
   content: string;
 }
 
+const BEAM_MIN_DURATION_MS = 4_000;
+
 export function AIApp() {
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [input, setInput] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isBeamActive, setIsBeamActive] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+  const beamStartedAtRef = React.useRef(0);
+  const beamTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const isMountedRef = React.useRef(true);
+
+  const clearBeamTimeout = React.useCallback(() => {
+    if (beamTimeoutRef.current !== null) {
+      clearTimeout(beamTimeoutRef.current);
+      beamTimeoutRef.current = null;
+    }
+  }, []);
+
+  const finishBeam = React.useCallback(() => {
+    if (!isMountedRef.current) return;
+
+    const elapsed = Date.now() - beamStartedAtRef.current;
+    const remaining = Math.max(BEAM_MIN_DURATION_MS - elapsed, 0);
+
+    clearBeamTimeout();
+    if (remaining === 0) {
+      setIsBeamActive(false);
+      return;
+    }
+
+    beamTimeoutRef.current = setTimeout(() => {
+      beamTimeoutRef.current = null;
+      setIsBeamActive(false);
+    }, remaining);
+  }, [clearBeamTimeout]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,11 +75,23 @@ export function AIApp() {
     }
   }, [isLoading]);
 
+  React.useEffect(() => {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      clearBeamTimeout();
+    };
+  }, [clearBeamTimeout]);
+
   const sendMessage = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input.trim() };
     const newMessages = [...messages, userMessage];
+    clearBeamTimeout();
+    beamStartedAtRef.current = Date.now();
+    setIsBeamActive(true);
     setMessages(newMessages);
     setInput("");
     setIsLoading(true);
@@ -78,6 +123,7 @@ export function AIApp() {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setIsLoading(false);
+      finishBeam();
     }
   };
 
@@ -147,16 +193,17 @@ export function AIApp() {
       {/* Input */}
       <div className="border-t border-border p-3">
         <BorderBeam
-          active={isLoading}
+          active={isBeamActive}
           className="w-full"
           colorVariant="mono"
-          duration={2.8}
+          duration={3.4}
           size="pulse-inner"
-          strength={0.45}
+          strength={0.9}
           theme="light"
         >
           <div
             className="flex gap-2 rounded-xl border border-border bg-background p-2"
+            data-beam-state={isBeamActive ? "active" : "idle"}
             data-state={isLoading ? "generating" : "idle"}
             data-testid="ai-composer"
           >
