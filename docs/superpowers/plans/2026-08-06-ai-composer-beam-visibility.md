@@ -11,7 +11,7 @@
 ## Global Constraints
 
 - Keep `pulse-inner`, `colorVariant="mono"`, and `theme="light"`.
-- Set Beam `strength={0.9}` and `duration={3.4}`.
+- Set Beam `strength={1}`, `brightness={0.72}`, and `duration={3.4}`.
 - Keep the Beam active for at least `4_000` milliseconds from submission.
 - Never delay the AI response or keep controls disabled solely for the Beam.
 - Keep timing state local to `AIApp`; do not introduce global state, a shared hook, or an API change.
@@ -128,11 +128,12 @@ Update the component props and inspectable state:
 ```tsx
 <BorderBeam
   active={isBeamActive}
+  brightness={0.72}
   className="w-full"
   colorVariant="mono"
   duration={3.4}
   size="pulse-inner"
-  strength={0.9}
+  strength={1}
   theme="light"
 >
   <div

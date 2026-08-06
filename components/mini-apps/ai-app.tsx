@@ -194,11 +194,12 @@ export function AIApp() {
       <div className="border-t border-border p-3">
         <BorderBeam
           active={isBeamActive}
+          brightness={0.72}
           className="w-full"
           colorVariant="mono"
           duration={3.4}
           size="pulse-inner"
-          strength={0.9}
+          strength={1}
           theme="light"
         >
           <div

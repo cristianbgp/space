@@ -8,7 +8,7 @@ Make the AI composer Beam easy to notice while preserving the app's monochrome, 
 
 - Keep the Beam around the complete composer surface only.
 - Keep `pulse-inner`, the `mono` color variant, and the light theme.
-- Increase Beam strength from `0.45` to `0.9` for a clearer white-and-gray glow.
+- Increase Beam strength from `0.45` to `1` and set brightness to `0.72` for a clearer medium-gray glow against the white composer.
 - Use a slower `3.4` second animation cycle so the pulse reads as deliberate rather than flickering.
 - Preserve the existing neutral composer border, 12px radius, message layout, and disabled-control styling.
 - Do not add color, a second animation, or a Beam around the whole mini-app window.
