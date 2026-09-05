@@ -155,6 +155,98 @@
   }
 }
 
+.desktop-dot-grid {
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(
+    145deg,
+    oklch(0.84 0 0),
+    oklch(0.9 0 0) 56%,
+    oklch(0.96 0 0)
+  );
+}
+
+.desktop-dot-grid::before,
+.desktop-dot-grid::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  background-position: 0 0;
+  background-size: 22px 22px;
+}
+
+.desktop-dot-grid::before {
+  background-image: radial-gradient(
+    circle,
+    oklch(0.3 0 0 / 0.2) 1px,
+    transparent 1.2px
+  );
+}
+
+.desktop-dot-grid::after {
+  opacity: 0;
+  background-image: radial-gradient(
+    circle,
+    oklch(0.2 0 0 / 0.72) 1.45px,
+    transparent 1.65px
+  );
+  mask-image: radial-gradient(
+    circle 120px at var(--pointer-x) var(--pointer-y),
+    black,
+    transparent
+  );
+  -webkit-mask-image: radial-gradient(
+    circle 120px at var(--pointer-x) var(--pointer-y),
+    black,
+    transparent
+  );
+  transition: opacity 180ms ease-out;
+}
+
+.desktop-dot-grid:hover::after {
+  opacity: 0.58;
+}
+
+.dark .desktop-dot-grid {
+  background: linear-gradient(
+    145deg,
+    oklch(0.13 0 0),
+    oklch(0.18 0 0) 56%,
+    oklch(0.22 0 0)
+  );
+}
+
+.dark .desktop-dot-grid::before {
+  background-image: radial-gradient(
+    circle,
+    oklch(0.8 0 0 / 0.18) 1px,
+    transparent 1.2px
+  );
+}
+
+.dark .desktop-dot-grid::after {
+  background-image: radial-gradient(
+    circle,
+    oklch(0.92 0 0 / 0.72) 1.45px,
+    transparent 1.65px
+  );
+}
+
+@media (hover: none) {
+  .desktop-dot-grid::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-dot-grid::after {
+    transition: none;
+  }
+}
+
 /* macOS-style blur effects */
 @supports (backdrop-filter: blur(20px)) {
   .menu-bar-blur {

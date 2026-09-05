@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { MenuBar } from "./menu-bar";
-import { Dock } from "./dock";
-import { WindowManager } from "./window-manager";
-import type { Window } from "./window-manager";
-import { Mix } from "./mini-apps/music-app";
+
+import { DesktopBackground } from "@/components/DesktopBackground";
+import { Dock } from "@/components/dock";
+import { MenuBar } from "@/components/menu-bar";
+import type { Mix } from "@/components/mini-apps/music-app";
+import { WindowManager, type Window } from "@/components/window-manager";
 import { useMusicStore } from "@/lib/music-store";
 
 export function Desktop({ mixes }: { mixes: Mix[] }) {
@@ -70,8 +71,7 @@ export function Desktop({ mixes }: { mixes: Mix[] }) {
 
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-background">
-      {/* Desktop background */}
-      <div className="absolute inset-0 bg-linear-to-br from-neutral-300 via-neutral-300 to-neutral-100" />
+      <DesktopBackground />
 
       {/* Menu Bar */}
       <MenuBar />
