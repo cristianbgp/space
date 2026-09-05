@@ -64,7 +64,7 @@ export function WindowManager({
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0"
+      className="pointer-events-none absolute inset-0"
     >
       <AnimatePresence>
         {windows.map((window) => (
@@ -253,7 +253,7 @@ function WindowComponent({
           opacity: { duration: 0.2 },
         }}
         className={cn(
-          "absolute min-h-0 overflow-hidden rounded-xl border border-(--window-border) bg-card shadow-2xl",
+          "pointer-events-auto absolute min-h-0 overflow-hidden rounded-xl border border-(--window-border) bg-card shadow-2xl",
           isActive ? "ring-1 ring-foreground/20" : ""
         )}
         style={{
@@ -323,7 +323,7 @@ function WindowComponent({
         onFocus(window.id);
       }}
       className={cn(
-        "absolute rounded-lg border border-(--window-border) bg-card shadow-2xl",
+        "pointer-events-auto absolute rounded-lg border border-(--window-border) bg-card shadow-2xl",
         isActive ? "ring-1 ring-foreground/20" : ""
       )}
       style={{

@@ -1,11 +1,15 @@
 import * as React from "react";
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { WindowManager, type Window } from "@/components/window-manager";
 
+const { mobileState } = vi.hoisted(() => ({
+  mobileState: { value: true },
+}));
+
 vi.mock("@/hooks/use-mobile", () => ({
-  useIsMobile: () => true,
+  useIsMobile: () => mobileState.value,
 }));
 
 vi.mock("motion/react", () => ({
@@ -48,6 +52,32 @@ const noteWindow: Window = {
   y: 100,
   zIndex: 1,
 };
+
+beforeEach(() => {
+  mobileState.value = true;
+});
+
+describe("WindowManager pointer layers", () => {
+  it("lets empty desktop space receive pointer input while windows remain interactive", () => {
+    mobileState.value = false;
+
+    const { container } = render(
+      <WindowManager
+        activeWindowId="notes"
+        onClose={vi.fn()}
+        onFocus={vi.fn()}
+        windows={[noteWindow]}
+      />
+    );
+
+    const manager = container.firstElementChild;
+    const windowElement = screen.getByText("Note content").parentElement
+      ?.parentElement;
+
+    expect(manager?.className).toContain("pointer-events-none");
+    expect(windowElement?.className).toContain("pointer-events-auto");
+  });
+});
 
 describe("WindowManager mobile sizing", () => {
   it("insets the window around mobile browser safe areas", () => {
